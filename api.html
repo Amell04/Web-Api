@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+   <div class="container">
+       <div class="row">
+           <div class="col-md-6">
+                <h2>Formulario de Registro</h2>
+                <div class="form-group">
+                    <label for="">Id:</label>
+                    <input type="number" id="Id" placeholder="Coloque un Numero.."class="form-control" required>
+            
+                    <label for="">Nombre:</label>
+                    <input type="text" id="Nombre" placeholder="Coloque un Nombre.." class="form-control" required>
+
+                    <label for="">Apellidos:</label>
+                    <input type="text" id="Apellidos" placeholder="Coloque un Apellidos.."class="form-control" required >
+
+                    <label for="">Fecha:</label>
+                    <input type="date" id="Fecha" placeholder="Coloque una Fecha.."class="form-control"  required>
+
+                    <label for="">Direccion:</label>
+                    <input type="text" id="Direccion" placeholder="Coloque una Direccion.." class="form-control" required>
+
+                    <label for="">Especialidad:</label>
+                    <select name="" id="Especialidad"  class="form-control">
+                        <option value="Matematica">Matematica</option>
+                        <option value="ingles">ingles</option>
+                        <option value="Programacion">Programacion</option>
+                    
+                    </select>
+                    <br>
+                    <input type="button" id="Guardar"value="Guardar" class="btn btn-success">
+                    
+                </div>
+            </div>
+            <div class="col-md-6">
+                    <table class="table">
+                            <thead>
+                                    <h1>
+                                           Listado de Docentes
+                                        </h1>
+                                <tr>
+                                        <td>Nombre</td>
+                                        <td>Apellidos</td>
+                                        <td>Fecha</td>
+                                        <td>Direccion</td>
+                                        <td>Especialidad</td>
+                                </tr>
+                                
+                            </thead>
+                            <tbody id="resultado">
+                                   
+                            </tbody>
+                        </table>
+               </div>
+           </div>
+           
+       </div>
+    
+    
+        <div class="row">
+                
+                
+                <script>
+                    $(document).ready(iniciar);
+
+                     function iniciar()
+                     {
+                       $("#Guardar").click(guardar)
+                        $.ajax({
+                            method: "Get",
+                            DataType: "Json",
+                            url: "http://localhost:57528/api/values",
+                            success: procesar
+                        });
+                        return false;
+                    };
+                    
+                    function guardar(){
+                        //recolectar Informacion 
+                        var id=$("#Id").val();
+                        var nombre=$("#Nombre").val();
+                        var apellido=$("#Apellidos").val();
+                        var fecha=$("#Fecha").val();
+                        var direccion=$("#Direccion").val();
+                        var especialidad=$("#Especialidad").val();
+
+                        //realizar la peticion para guardar
+                        $.ajax({
+                            method: "POST",
+                            data:{
+                                Iddocente:id,
+                                nombre:nombre,
+                                Apellido:apellido,
+                                fecha:fecha,
+                                direccion:direccion,
+                                especialidad:especialidad
+                            },
+                            url: "http://localhost:57528/api/values",
+                            success: procesarg,
+                         
+                        });
+
+                    }
+                    function procesarg(data){
+                        //if(data==1){
+                            alert("Procesando");
+                            iniciar();
+                       // }
+                      //  else{
+                          //  alert("No Procesando");
+                      //  }
+                        
+                    }
+                    
+                    
+                    function procesar(data) {
+                      //  alert("Hola 2");
+                        var rows = "";
+                        for (i = 0; i < data.length; i++) {
+                            rows = rows + "<tr><td>" + data[i].nombre + "</td><td>" + data[i].apellido + "</td><td>" + data[i].fecha + "</td><td>" + data[i].direccion+"</td><td>"+ data[i].especialidad+ "</td></tr>" ;
+                        }
+                        $("#resultado").html(rows);
+                    }
+            
+            
+                </script>
+            </div>
+</body>
+</html>

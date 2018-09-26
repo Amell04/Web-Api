@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+ 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+     <div ng-app="aplicacion" ng-controller="webApiControler">
+        <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                         <h2>Formulario de Registro</h2>
+                         
+                                <div class="form-group">
+                                        <label for="">Id:</label>
+                                        <input ng-disabled="btnGA==false" type="number" id="Id" ng-model="Id" placeholder="Coloque un Numero.."class="form-control" required>
+                                
+                                        <label for="">Nombre:</label>
+                                        <input type="text" id="Nombre" ng-model="Nombre" placeholder="Coloque un Nombre.." class="form-control" required>
+                    
+                                        <label for="">Apellidos:</label>
+                                        <input type="text" id="Apellidos"  ng-model="Apellidos" placeholder="Coloque un Apellidos.."class="form-control" required >
+                    
+                                        <label for="">Fecha:</label>
+                                        <input type="date" id="Fecha"   ng-model="Fecha" placeholder="Coloque una Fecha.."class="form-control"  required>
+                    
+                                        <label for="">Direccion:</label>
+                                        <input type="text" id="Direccion" ng-model="Direccion" placeholder="Coloque una Direccion.." class="form-control" required>
+                    
+                                        <label >Especialidad:</label>
+                                        <select name="" id="Especialidad" ng-model="Especialidad"  class="form-control">
+                                            <option value="Matematica">Matematica</option>
+                                            <option value="ingles">ingles</option>
+                                            <option value="Programacion">Programacion</option>
+                                        
+                                        </select>
+                                        <br>
+                                        <input ng-if="btnGA==true" type="button" id="Guardar"value="Guardar" class="btn btn-success" ng-submit="guardar()">
+                                        <button ng-if="btnGA==false" class="btn btn-primary" ng-click="actualizar()">Actualizar</button>
+                                        <button ng-if="btnGA==false" class="btn btn-danger" ng-click="reset()">Cancelar</button>
+                                        
+                                    </div>
+                     </div>
+                     <div class="col-md-6">
+                          
+                                    <h1>Datos de Servicio Web </h1>
+                                    <table class="table table-hover">
+                                            <thead>
+                                                    <h1>
+                                                           Listado de Docentes
+                                                        </h1>
+                                                <tr>
+                                                        <th>Id</th>
+                                                        <th>Nombre</th>
+                                                        <th>Apellidos</th>
+                                                        <th>Fecha</th>
+                                                        <th>Direccion</th>
+                                                        <th>Especialidad</th>
+                                                </tr>
+                                                
+                                            </thead>
+                                            <tbody>
+                                                    <tr data-ng-repeat="i in lista">
+                                                    <td>{{i.Iddocente}}</td>
+                                                    <td>{{i.nombre}}</td>
+                                                    <td>{{i.apellido}}</td>
+                                                    <td>{{i.fecha}}</td>
+                                                    <td>{{i.direccion}}</td>
+                                                    <td>{{i.especialidad}}</td>
+                                                    <td>
+                                                            <button class="btn btn-danger" ng-click="eliminar(i.Iddocente)">Eliminar</button>
+                                                            <button class="btn btn-warning" ng-click="cargarId(i.Iddocente)" >Modificar</button>
+                                                    </td>
+                                                </tr>
+                                                
+                                            </tbody>
+                                        </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+  <script>
+//inicializando la app de angular 
+var app=angular.module("aplicacion",[]);
+
+//agregando controlador
+
+
+
+app.controller("webApiControler",function($scope,$http){
+    //Variable de bandera para activar y desactivar los botones de guardar y actulaixzas
+        $scope.btnGA=true;
+
+        $scope.cargar=function(){
+          //inicializando la peticion al servidor web 
+          $http.get("http://localhost:57528/api/values").then(function success(response){
+          //en caso que se realize completametne la peticion
+          $scope.datos= response.data; //.data para acceder a toda la imformacion del response
+          $scope.lista=response.data;
+          }, 
+         function error(){
+          //en caso que se genere un errror en la peticion
+          $scope.datos="Error en la peticion"+response.statusText;
+            });
+    }  
+             //Funcion Reset 
+               $scope.reset=function(){
+               $scope.Id=null;
+                $scope.nombre=null;
+                $scope.apellido=null;
+                $scope.fecha=null;
+                $scope.direccion=null;
+                $scope.especialidad=null;
+                $scope.btnGA=true;
+                }
+                //----------------------------------------------------------------------------------------------------
+                 $scope.cargar();//cargando los datos de la lista , con la llamda de esta funcion 
+
+                 //registro de docente
+
+                 //funcion para guardar registro con una peticion POST a un servicio web de una API
+                 $scope.guardar=function(){
+                    
+                     //recolectando Informacion 
+                      var data={
+            //datos : Modelo----------Ng-Model        
+                      Iddocente:$scope.Id,
+                      nombre:$scope.Nombre,
+                      apellido:$scope.Apellido,
+                      fecha:$scope.Fecha,
+                      direccion:$scope.Direccion,
+                      especialidad:$scope.Especialidad
+                      }
+     
+                       //realizando peticion
+                       //          JSON.stringify se usa para asegurarse que los datos vayan en formato Json
+                       $http.post("http://localhost:57528/api/values",JSON.stringify(data)).then(
+                      function success(response){
+                     
+                       $scope.cargar();
+                       $scope.reset();
+                       },
+                         function error(response){
+                          alert("No guardado");
+                    });
+
+                    }
+                    //funcion para eliminar 
+                    $scope.eliminar=function(id){
+                        alert("ID:"+id);
+                        $http.delete("http://localhost:57528/api/values/"+id).then(
+                      function success(response){
+                      
+                       $scope.cargar();
+                       },
+                         function error(response){
+                          alert("No elimnado");
+                    });
+                    }
+
+                    //funcion para cargar los datos de moficicar
+                    $scope.cargarId=function(id){
+
+                        $scope.btnGA=false;
+                        //inicializando la peticion al servidor web 
+          $http.get("http://localhost:57528/api/values/"+id).then(function success(response){
+          //en caso que se realize completametne la peticion
+          $scope.Id= response.data.Iddocente; 
+          $scope.Nombre=response.data.nombre;
+          $scope.Apellido=response.data.apellido;
+          $scope.Fecha=new Date(response.data.fecha);
+          $scope.Direccion=response.data.direccion;
+          $scope.Especialidad=response.data.especialidad;
+          }, 
+
+         function errorp(){
+          //en caso que se genere un errror en la peticion
+          $scope.datos="Error en la peticion"+response.statusText;
+
+            });
+            //Boton de actualizar
+$scope.actualizar=function(){
+  alert("Estamos Actualizando");
+    var data={
+            //datos : Modelo----------Ng-Model        
+                      Iddocente:$scope.Id,
+                      nombre:$scope.Nombre,
+                      apellido:$scope.Apellido,
+                      fecha:$scope.Fecha,
+                      direccion:$scope.Direccion,
+                      especialidad:$scope.Especialidad
+                      }
+     
+                       //realizando peticion
+                       //JSON.stringify se usa para asegurarse que los datos vayan en formato Json
+                       $http.put("http://localhost:57528/api/values/"+$scope.Id,JSON.stringify(data)).then(
+                      function success(response){
+                     alert("Resgistro Modificado");
+                     $scope.cargar();
+                     //cambiando estado de botones
+                     $scope.btnGA=true;
+                       $scope.reset();
+                       },
+                         function error(response){
+                          alert("No Modificado");
+                    });
+
+}
+                    }
+                 });
+           </script>
+     </body>
+</html>
